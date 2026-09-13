@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Review Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><h2>ReviewHub Admin</h2></div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="dashboard-section">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Admin Panel</h1>
+                    <p>Platform Administration & Management</p>
+                </div>
+
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <h3>System Status</h3>
+                        <p>✅ All Systems Operational</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Approvals</h3>
+                        <p>Previous companies now approved automatically</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Documents</h3>
+                        <p>All uploads stored for verification</p>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Platform Features</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h4>✅ Automatic Company Approval</h4>
+                            <p>Previous companies are approved immediately when submitted with required documents.</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>✅ Document Verification</h4>
+                            <p>All employees must upload proof documents (PDF, DOC, JPG) when adding previous companies.</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>✅ Review Management</h4>
+                            <p>Employees can create, edit, and delete their own reviews at any time.</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>✅ Company Autosuggest</h4>
+                            <p>Employees get smart suggestions when adding previous companies.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Quick Actions</h2>
+                    <p><a href="{{ url_for('employee_dashboard') }}" class="nav-link">Test as Employee</a></p>
+                    <p><a href="{{ url_for('user_dashboard') }}" class="nav-link">Test as Job Seeker</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="errorMessage" class="error-message" style="display:none;"></div>
+    <div id="successMessage" class="success-message" style="display:none;"></div>
+
+    <script>
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSuccess('Admin panel loaded successfully');
+        });
+    </script>
+</body>
+</html>

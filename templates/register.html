@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Company Review Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join our review community</p>
+            </div>
+
+            <div class="form-toggle">
+                <button class="toggle-btn active" onclick="toggleFormType('jobseeker')">Job Seeker</button>
+                <button class="toggle-btn" onclick="toggleFormType('employee')">Employee</button>
+            </div>
+
+            <form id="registerForm" method="POST" onsubmit="handleRegister(event)">
+                <!-- Common Fields -->
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" placeholder="Enter a strong password" required>
+                    <small>Password must be at least 6 characters</small>
+                </div>
+
+                <!-- Employee Fields -->
+                <div id="employeeFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="company">Current Company Name *</label>
+                        <input type="text" id="company" name="company" placeholder="Enter your company name">
+                        <small>You'll be able to review only this company and previous companies with documents</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jobRole">Current Job Role *</label>
+                        <select id="jobRole" name="job_role">
+                            <option value="">Select your job role</option>
+                            <option value="Software Developer (SDE)">Software Developer (SDE)</option>
+                            <option value="HR">HR</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Intern">Intern</option>
+                            <option value="Product Manager">Product Manager</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Designer">Designer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" id="user_type" name="user_type" value="jobseeker">
+
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFormType(type) {
+            const buttons = document.querySelectorAll('.toggle-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const userTypeInput = document.getElementById('user_type');
+            const employeeFields = document.getElementById('employeeFields');
+            const companyInput = document.getElementById('company');
+            const jobRoleInput = document.getElementById('jobRole');
+
+            if (type === 'employee') {
+                userTypeInput.value = 'employee';
+                employeeFields.style.display = 'block';
+                companyInput.required = true;
+                jobRoleInput.required = true;
+            } else {
+                userTypeInput.value = 'jobseeker';
+                employeeFields.style.display = 'none';
+                companyInput.required = false;
+                jobRoleInput.required = false;
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('registerForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Validation
+            if (data.password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+
+            if (data.user_type === 'employee') {
+                if (!data.company || !data.job_role) {
+                    showError('Please fill all employee fields');
+                    return;
+                }
+            }
+
+            fetch('{{ url_for("register") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        if (document.getElementById('user_type').value === 'employee') {
+                            window.location.href = '{{ url_for("employee_dashboard") }}';
+                        } else {
+                            window.location.href = '{{ url_for("user_dashboard") }}';
+                        }
+                    }, 2000);
+                } else {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                showError('An error occurred. Please try again.');
+                console.error('Error:', error);
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

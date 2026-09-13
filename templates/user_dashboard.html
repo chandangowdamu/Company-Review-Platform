@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Dashboard - Company Review Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2>ReviewHub</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><span class="welcome">Welcome, {{ user.name }}!</span></li>
+                <li><a href="#companies" class="nav-link">Companies</a></li>
+                <li><a href="#reviews" class="nav-link">Reviews</a></li>
+                <li><a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Find Your Next Perfect Company</h1>
+                <p>Read authentic reviews from employees in different roles</p>
+                <div class="search-bar">
+                    <input type="text" id="searchCompany" placeholder="Search companies..." onkeyup="searchCompanies()">
+                    <button onclick="searchCompanies()">Search</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="filters-section">
+            <div class="container">
+                <h2>Filter Reviews</h2>
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label for="roleFilter">Job Role:</label>
+                        <select id="roleFilter" onchange="filterReviews()">
+                            <option value="">All Roles</option>
+                            <option value="Software Developer (SDE)">Software Developer (SDE)</option>
+                            <option value="HR">HR</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Intern">Intern</option>
+                            <option value="Product Manager">Product Manager</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Designer">Designer</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-item">
+                        <label for="ratingFilter">Minimum Rating:</label>
+                        <select id="ratingFilter" onchange="filterReviews()">
+                            <option value="1">All Ratings</option>
+                            <option value="2">⭐⭐ and above</option>
+                            <option value="3">⭐⭐⭐ and above</option>
+                            <option value="4">⭐⭐⭐⭐ and above</option>
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                        </select>
+                    </div>
+
+                    <button onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Companies Section -->
+        <section id="companies" class="companies-section">
+            <div class="container">
+                <h2>Browse Companies</h2>
+                <div class="companies-ticker-wrap">
+                    <div class="companies-ticker">
+                        <span>Google</span>
+                        <span>Amazon</span>
+                        <span>Microsoft</span>
+                        <span>Apple</span>
+                        <span>Meta</span>
+                        <span>Tesla</span>
+                        <span>Netflix</span>
+                        <span>Salesforce</span>
+                        <span>Adobe</span>
+                        <span>Intel</span>
+                        <span>IBM</span>
+                        <span>Spotify</span>
+                        <span>Uber</span>
+                        <span>Airbnb</span>
+                        <span>Nvidia</span>
+                        <span>Cisco</span>
+                        <span>Oracle</span>
+                        <span>Dropbox</span>
+                        <span>Twitter</span>
+                        <span>Zoom</span>
+                        <span aria-hidden="true">Google</span>
+                        <span aria-hidden="true">Amazon</span>
+                        <span aria-hidden="true">Microsoft</span>
+                        <span aria-hidden="true">Apple</span>
+                        <span aria-hidden="true">Meta</span>
+                        <span aria-hidden="true">Tesla</span>
+                        <span aria-hidden="true">Netflix</span>
+                        <span aria-hidden="true">Salesforce</span>
+                        <span aria-hidden="true">Adobe</span>
+                        <span aria-hidden="true">Intel</span>
+                        <span aria-hidden="true">IBM</span>
+                        <span aria-hidden="true">Spotify</span>
+                        <span aria-hidden="true">Uber</span>
+                        <span aria-hidden="true">Airbnb</span>
+                        <span aria-hidden="true">Nvidia</span>
+                        <span aria-hidden="true">Cisco</span>
+                        <span aria-hidden="true">Oracle</span>
+                        <span aria-hidden="true">Dropbox</span>
+                        <span aria-hidden="true">Twitter</span>
+                        <span aria-hidden="true">Zoom</span>
+                    </div>
+                </div>
+                <div id="companiesList" class="companies-grid">
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=600&q=80" alt="Google office">
+                        <h3>Google</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 14,582</p>
+                            <p><strong>Rating:</strong> 4.8</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80" alt="Amazon workplace">
+                        <h3>Amazon</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 12,340</p>
+                            <p><strong>Rating:</strong> 4.2</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80" alt="Microsoft campus">
+                        <h3>Microsoft</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 10,120</p>
+                            <p><strong>Rating:</strong> 4.5</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=600&q=80" alt="Apple office">
+                        <h3>Apple</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 9,844</p>
+                            <p><strong>Rating:</strong> 4.6</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1485217988980-11786ced9454?auto=format&fit=crop&w=600&q=80" alt="Meta building">
+                        <h3>Meta</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 8,215</p>
+                            <p><strong>Rating:</strong> 4.3</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Tesla office">
+                        <h3>Tesla</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 7,980</p>
+                            <p><strong>Rating:</strong> 4.1</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80" alt="Netflix workspace">
+                        <h3>Netflix</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 6,780</p>
+                            <p><strong>Rating:</strong> 4.4</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=600&q=80" alt="Salesforce office">
+                        <h3>Salesforce</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 6,150</p>
+                            <p><strong>Rating:</strong> 4.7</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80" alt="Adobe studio">
+                        <h3>Adobe</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 5,910</p>
+                            <p><strong>Rating:</strong> 4.6</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1517242742707-63e9f17e4d1c?auto=format&fit=crop&w=600&q=80" alt="Intel campus">
+                        <h3>Intel</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 5,740</p>
+                            <p><strong>Rating:</strong> 4.0</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80" alt="IBM building">
+                        <h3>IBM</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 5,320</p>
+                            <p><strong>Rating:</strong> 4.2</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80" alt="Spotify creative space">
+                        <h3>Spotify</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,980</p>
+                            <p><strong>Rating:</strong> 4.5</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=600&q=80" alt="Uber office">
+                        <h3>Uber</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,870</p>
+                            <p><strong>Rating:</strong> 4.1</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Airbnb workspace">
+                        <h3>Airbnb</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,650</p>
+                            <p><strong>Rating:</strong> 4.4</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1519337265831-281ec6cc8514?auto=format&fit=crop&w=600&q=80" alt="Nvidia campus">
+                        <h3>Nvidia</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,520</p>
+                            <p><strong>Rating:</strong> 4.7</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=600&q=80" alt="Cisco office">
+                        <h3>Cisco</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,210</p>
+                            <p><strong>Rating:</strong> 4.1</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1497493292307-31c376b6e479?auto=format&fit=crop&w=600&q=80" alt="Oracle headquarters">
+                        <h3>Oracle</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 4,015</p>
+                            <p><strong>Rating:</strong> 4.0</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1485217988980-11786ced9454?auto=format&fit=crop&w=600&q=80" alt="Dropbox workspace">
+                        <h3>Dropbox</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 3,820</p>
+                            <p><strong>Rating:</strong> 4.3</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1517242742707-63e9f17e4d1c?auto=format&fit=crop&w=600&q=80" alt="Twitter office">
+                        <h3>Twitter</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 3,650</p>
+                            <p><strong>Rating:</strong> 4.0</p>
+                        </div>
+                    </div>
+                    <div class="company-card">
+                        <img class="company-image" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80" alt="Zoom meeting room">
+                        <h3>Zoom</h3>
+                        <div class="company-stats">
+                            <p><strong>Reviews:</strong> 3,420</p>
+                            <p><strong>Rating:</strong> 4.2</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section id="reviews" class="reviews-section">
+            <div class="container">
+                <h2>Latest Reviews</h2>
+                <div id="reviewsList" class="reviews-list">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-meta">
+                                    <h3>{{ review.title }}</h3>
+                                    <p class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                <div class="stars">{{ '⭐' * review.rating }}</div>
+                            </div>
+                            <div class="review-content">
+                                <p><strong>Company:</strong> <span id="company-name-{{ review._id }}">Loading...</span></p>
+                                <p><strong>Role:</strong> {{ review.job_role }}</p>
+                                <p class="feedback">{{ review.feedback[:200] }}...</p>
+                                {% if review.pros %}
+                                <p><strong>Pros:</strong> {{ review.pros[:100] }}...</p>
+                                {% endif %}
+                                {% if review.cons %}
+                                <p><strong>Cons:</strong> {{ review.cons[:100] }}...</p>
+                                {% endif %}
+                                {% if review.how_got %}
+                                <p><strong>How Got:</strong> {{ review.how_got }}</p>
+                                {% endif %}
+                                {% if review.interview_difficulty %}
+                                <p><strong>Interview Difficulty:</strong> {{ review.interview_difficulty }}</p>
+                                {% endif %}
+                                {% if review.interview_rounds %}
+                                <p><strong>Rounds:</strong> {{ review.interview_rounds }}</p>
+                                {% endif %}
+                                {% if review.technical_questions %}
+                                <p><strong>Tech Qs:</strong> {{ review.technical_questions }}</p>
+                                {% endif %}
+                                {% if review.hr_experience %}
+                                <p><strong>HR:</strong> {{ review.hr_experience }}</p>
+                                {% endif %}
+                                {% if review.tips %}
+                                <p><strong>Tips:</strong> {{ review.tips }}</p>
+                                {% endif %}
+                                {% if review.salary_range %}
+                                <p><strong>Salary:</strong> {{ review.salary_range }}</p>
+                                {% endif %}
+                                {% if review.years_experience %}
+                                <p><strong>Experience:</strong> {{ review.years_experience }}</p>
+                                {% endif %}
+                                {% if review.location %}
+                                <p><strong>Location:</strong> {{ review.location }}</p>
+                                {% endif %}
+                            </div>
+                            <button class="read-more-btn" onclick="viewReview('{{ review._id }}')">Read Full Review</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No reviews available yet. Check back soon!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Details Modal -->
+        <div id="companyModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <div id="companyDetails"></div>
+            </div>
+        </div>
+
+        <!-- Review Details Modal -->
+        <div id="reviewModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close" onclick="closeReviewModal()">&times;</span>
+                <div id="reviewDetails"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ReviewHub - Company Review Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+    <script>
+        // Load company stats and initial reviews on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCompanyStats();
+            loadReviews();
+        });
+
+        function selectCompany(companyId) {
+            currentCompanyId = companyId;
+            // visually highlight selected company?
+            loadReviews();
+        }
+
+        function loadReviews() {
+            // call search endpoint with current filters
+            const role = document.getElementById('roleFilter').value;
+            const minRating = document.getElementById('ratingFilter').value;
+            let params = new URLSearchParams();
+            if (currentCompanyId) params.append('company_id', currentCompanyId);
+            if (role) params.append('role', role);
+            if (minRating) params.append('min_rating', minRating);
+
+            fetch(`{{ url_for("search_reviews") }}?${params}`)
+                .then(response => response.json())
+                .then(reviews => {
+                    const list = document.getElementById('reviewsList');
+                    list.innerHTML = '';
+                    if (reviews.length === 0) {
+                        list.innerHTML = '<div class="empty-state"><p>No reviews available</p></div>';
+                        return;
+                    }
+                    reviews.forEach(review => {
+                        const card = document.createElement('div');
+                        card.className = 'review-card';
+                        card.innerHTML = `
+                            <div class="review-header">
+                                <div class="review-meta">
+                                    <h3>${review.title}</h3>
+                                    <p class="review-date">${review.created_at}</p>
+                                </div>
+                                <div class="stars">${'⭐'.repeat(review.rating)}</div>
+                            </div>
+                            <div class="review-content">
+                                <p><strong>Company:</strong> ${review.company}</p>
+                                <p><strong>Role:</strong> ${review.job_role}</p>
+                                <p class="feedback">${review.feedback.substring(0,200)}...</p>
+                                ${review.pros ? `<p><strong>Pros:</strong> ${review.pros.substring(0,100)}...</p>` : ''}
+                                ${review.cons ? `<p><strong>Cons:</strong> ${review.cons.substring(0,100)}...</p>` : ''}
+                                ${review.how_got ? `<p><strong>How Got:</strong> ${review.how_got}</p>` : ''}
+                                ${review.interview_difficulty ? `<p><strong>Interview Difficulty:</strong> ${review.interview_difficulty}</p>` : ''}
+                                ${review.interview_rounds ? `<p><strong>Rounds:</strong> ${review.interview_rounds}</p>` : ''}
+                                ${review.technical_questions ? `<p><strong>Tech Qs:</strong> ${review.technical_questions}</p>` : ''}
+                                ${review.hr_experience ? `<p><strong>HR:</strong> ${review.hr_experience}</p>` : ''}
+                                ${review.tips ? `<p><strong>Tips:</strong> ${review.tips}</p>` : ''}
+                                ${review.salary_range ? `<p><strong>Salary:</strong> ${review.salary_range}</p>` : ''}
+                                ${review.years_experience ? `<p><strong>Experience:</strong> ${review.years_experience}</p>` : ''}
+                                ${review.location ? `<p><strong>Location:</strong> ${review.location}</p>` : ''}
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+
+        function loadCompanyStats() {
+            const companies = document.querySelectorAll('.company-card');
+            companies.forEach(card => {
+                const onclickValue = card.getAttribute('onclick');
+                if (!onclickValue) return;
+                const match = onclickValue.match(/'([^']+)'/);
+                if (!match) return;
+                const companyId = match[1];
+                fetch(`{{ url_for("get_company_details", company_id="") }}${companyId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const countEl = document.getElementById(`review-count-${companyId}`);
+                        const ratingEl = document.getElementById(`avg-rating-${companyId}`);
+                        if (countEl) countEl.textContent = data.reviews;
+                        if (ratingEl) ratingEl.textContent = createStars(data.average_rating);
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        }
+
+        // Populate the company grid by fetching all companies (optionally with role filter)
+        function loadCompanies() {
+            const roleFilterVal = document.getElementById('roleFilter') ? document.getElementById('roleFilter').value : '';
+            let url = `{{ url_for("manage_companies") }}`;
+            if (roleFilterVal) url += `?role=${encodeURIComponent(roleFilterVal)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(companies => {
+                    const list = document.getElementById('companiesList');
+                    list.innerHTML = '';
+                    if (!companies || companies.length === 0) {
+                        list.innerHTML = '<div class="empty-state"><p>No companies found</p></div>';
+                        return;
+                    }
+                    companies.forEach(company => {
+                        const card = document.createElement('div');
+                        card.className = 'company-card';
+                        card.onclick = () => selectCompany(company._id);
+                        card.innerHTML = `
+                            <div class="company-icon">🏢</div>
+                            <h3>${company.name}</h3>
+                            <div class="company-stats">
+                                <p><strong>Reviews:</strong> <span id="review-count-${company._id}">${company.review_count}</span></p>
+                                <p><strong>Rating:</strong> <span id="avg-rating-${company._id}">${createStars(company.average_rating)}</span></p>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    });
+                })
+                .catch(err => console.error('Error loading companies:', err));
+        }
+
+        function createStars(rating) {
+            if (!rating) return '-';
+            return '⭐'.repeat(Math.round(rating)) + ` (${rating})`;
+        }
+
+        let currentCompanyId = '';
+
+        function searchCompanies() {
+            const searchTerm = document.getElementById('searchCompany').value.trim();
+            const roleFilterVal = document.getElementById('roleFilter').value;
+            let url = `{{ url_for("manage_companies") }}?search=${encodeURIComponent(searchTerm)}`;
+            if (roleFilterVal) {
+                url += `&role=${encodeURIComponent(roleFilterVal)}`;
+            }
+            
+            if (searchTerm.length === 0) {
+                currentCompanyId = '';
+                loadCompanies();
+                loadReviews();
+                return;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(companies => {
+                    const list = document.getElementById('companiesList');
+                    list.innerHTML = '';
+                    
+                    if (companies.length === 0) {
+                        list.innerHTML = '<div class="empty-state"><p>No companies found</p></div>';
+                        currentCompanyId = '';
+                        loadReviews();
+                        return;
+                    }
+                    // if only one result or exact match, auto-select
+                    const exact = companies.find(c => c.name.toLowerCase() === searchTerm.toLowerCase());
+                    if (exact) {
+                        currentCompanyId = exact._id;
+                        loadReviews();
+                    } else if (companies.length === 1) {
+                        currentCompanyId = companies[0]._id;
+                        loadReviews();
+                    } else {
+                        // reset reviews list if multiple
+                        currentCompanyId = '';
+                        loadReviews();
+                    }
+
+                    companies.forEach(company => {
+                        const card = document.createElement('div');
+                        card.className = 'company-card';
+                        card.onclick = () => selectCompany(company._id);
+                        card.innerHTML = `
+                            <div class="company-icon">🏢</div>
+                            <h3>${company.name}</h3>
+                            <div class="company-stats">
+                                <p><strong>Reviews:</strong> ${company.review_count}</p>
+                                <p><strong>Rating:</strong> ${createStars(company.average_rating)}</p>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    showError('Error searching companies');
+                    console.error('Error:', error);
+                });
+        }
+
+        function filterReviews() {
+            // refresh company grid based on role and current search
+            searchCompanies();
+            const role = document.getElementById('roleFilter').value;
+            const minRating = document.getElementById('ratingFilter').value;
+
+            let params = new URLSearchParams();
+            if (currentCompanyId) params.append('company_id', currentCompanyId);
+            if (role) params.append('role', role);
+            if (minRating) params.append('min_rating', minRating);
+
+            fetch(`{{ url_for("search_reviews") }}?${params}`)
+                .then(response => response.json())
+                .then(reviews => {
+                    const list = document.getElementById('reviewsList');
+                    list.innerHTML = '';
+
+                    if (reviews.length === 0) {
+                        list.innerHTML = '<div class="empty-state"><p>No reviews match your filters</p></div>';
+                        return;
+                    }
+
+                    reviews.forEach(review => {
+                        const card = document.createElement('div');
+                        card.className = 'review-card';
+                        card.innerHTML = `
+                            <div class="review-header">
+                                <div class="review-meta">
+                                    <h3>${review.title}</h3>
+                                    <p class="review-date">${review.created_at}</p>
+                                </div>
+                                <div class="stars">${'⭐'.repeat(review.rating)}</div>
+                            </div>
+                            <div class="review-content">
+                                <p><strong>Company:</strong> ${review.company}</p>
+                                <p><strong>Role:</strong> ${review.job_role}</p>
+                                <p class="feedback">${review.feedback.substring(0, 200)}...</p>
+                                ${review.pros ? `<p><strong>Pros:</strong> ${review.pros.substring(0, 100)}...</p>` : ''}
+                                ${review.cons ? `<p><strong>Cons:</strong> ${review.cons.substring(0, 100)}...</p>` : ''}
+                                ${review.how_got ? `<p><strong>How Got:</strong> ${review.how_got}</p>` : ''}
+                                ${review.interview_difficulty ? `<p><strong>Interview Difficulty:</strong> ${review.interview_difficulty}</p>` : ''}
+                                ${review.interview_rounds ? `<p><strong>Rounds:</strong> ${review.interview_rounds}</p>` : ''}
+                                ${review.technical_questions ? `<p><strong>Tech Qs:</strong> ${review.technical_questions}</p>` : ''}
+                                ${review.hr_experience ? `<p><strong>HR:</strong> ${review.hr_experience}</p>` : ''}
+                                ${review.tips ? `<p><strong>Tips:</strong> ${review.tips}</p>` : ''}
+                                ${review.salary_range ? `<p><strong>Salary:</strong> ${review.salary_range}</p>` : ''}
+                                ${review.years_experience ? `<p><strong>Experience:</strong> ${review.years_experience}</p>` : ''}
+                                ${review.location ? `<p><strong>Location:</strong> ${review.location}</p>` : ''}
+                            </div>
+                            <button class="read-more-btn" onclick="viewReview('${review.id}')">Read Full Review</button>
+                        `;
+                        list.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    showError('Error filtering reviews');
+                    console.error('Error:', error);
+                });
+        }
+
+        function resetFilters() {
+            document.getElementById('roleFilter').value = '';
+            document.getElementById('ratingFilter').value = '1';
+            loadCompanyStats();
+            location.reload();
+        }
+
+        function viewCompanyDetails(companyId) {
+            fetch(`{{ url_for("get_company_details", company_id="") }}${companyId}`)
+                .then(response => response.json())
+                .then(data => {
+                    fetch(`{{ url_for("get_company_reviews_api", company_id="") }}${companyId}`)
+                        .then(response => response.json())
+                        .then(reviews => {
+                            let html = `
+                                <h2>${data.name}</h2>
+                                <div class="modal-stats">
+                                    <p><strong>Average Rating:</strong> ${createStars(data.average_rating)}</p>
+                                    <p><strong>Total Reviews:</strong> ${data.reviews}</p>
+                                </div>
+                                <div class="role-ratings">
+                                    <h3>Ratings by Role:</h3>
+                            `;
+
+                            for (const [role, stats] of Object.entries(data.role_ratings)) {
+                                html += `
+                                    <p><strong>${role}:</strong> ${createStars(stats.average)} (${stats.count} reviews)</p>
+                                `;
+                            }
+
+                            html += '</div><div class="modal-reviews"><h3>Reviews:</h3>';
+
+                            if (reviews.length === 0) {
+                                html += '<p>No reviews yet</p>';
+                            } else {
+                                reviews.forEach(review => {
+                                    html += `
+                                        <div class="review-preview">
+                                            <h4>${review.title}</h4>
+                                            <p><strong>Role:</strong> ${review.job_role}</p>
+                                            <p><strong>Rating:</strong> ${'⭐'.repeat(review.rating)}</p>
+                                            <p>${review.feedback}</p>
+                                            ${review.how_got ? `<p><strong>How Got:</strong> ${review.how_got}</p>` : ''}
+                                            ${review.interview_difficulty ? `<p><strong>Interview Difficulty:</strong> ${review.interview_difficulty}</p>` : ''}
+                                            ${review.interview_rounds ? `<p><strong>Rounds:</strong> ${review.interview_rounds}</p>` : ''}
+                                            ${review.technical_questions ? `<p><strong>Tech Qs:</strong> ${review.technical_questions}</p>` : ''}
+                                            ${review.hr_experience ? `<p><strong>HR:</strong> ${review.hr_experience}</p>` : ''}
+                                            ${review.tips ? `<p><strong>Tips:</strong> ${review.tips}</p>` : ''}
+                                            ${review.salary_range ? `<p><strong>Salary:</strong> ${review.salary_range}</p>` : ''}
+                                            ${review.years_experience ? `<p><strong>Experience:</strong> ${review.years_experience}</p>` : ''}
+                                            ${review.location ? `<p><strong>Location:</strong> ${review.location}</p>` : ''}
+                                        </div>
+                                    `;
+                                });
+                            }
+
+                            html += '</div>';
+                            document.getElementById('companyDetails').innerHTML = html;
+                            document.getElementById('companyModal').style.display = 'block';
+                        });
+                })
+                .catch(error => {
+                    showError('Error loading company details');
+                    console.error('Error:', error);
+                });
+        }
+
+        function viewReview(reviewId) {
+            showError('Full review view will be displayed here');
+        }
+
+        function closeModal() {
+            document.getElementById('companyModal').style.display = 'none';
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('companyModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

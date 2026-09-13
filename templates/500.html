@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Server Error</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .error-content {
+            text-align: center;
+        }
+        .error-content h1 {
+            font-size: 100px;
+            margin: 0;
+            color: var(--danger-color);
+        }
+        .error-content p {
+            font-size: 24px;
+            color: var(--light-text);
+            margin-bottom: 30px;
+        }
+        .error-content a {
+            display: inline-block;
+            padding: 14px 30px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .error-content a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-content">
+            <h1>500</h1>
+            <p>Internal Server Error</p>
+            <p style="font-size: 16px; margin-bottom: 30px;">We apologize for the inconvenience. Our team is working on this issue.</p>
+            <a href="{{ url_for('index') }}">Go Back Home</a>
+        </div>
+    </div>
+</body>
+</html>

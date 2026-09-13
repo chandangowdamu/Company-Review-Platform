@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - Company Review Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2>ReviewHub</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><span class="welcome">Welcome, {{ user.name }}!</span></li>
+                <li><a href="#reviews" class="nav-link">My Reviews</a></li>
+                <li><a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="dashboard-section">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Employee Dashboard</h1>
+                    <p>Share your work experience and help job seekers make better decisions</p>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>{{ total_reviews }}</h3>
+                        <p>Reviews Written</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>{{ user.get('company', 'N/A') }}</h3>
+                        <p>Current Company</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>{{ user.get('job_role', 'N/A') }}</h3>
+                        <p>Current Role</p>
+                    </div>
+                </div>
+
+                <!-- Review Creation Section -->
+                <div class="review-create-section">
+                    <h2>Write a Review</h2>
+                    <div class="review-tabs">
+                        <button class="tab-btn active" onclick="switchTab('current')">Current Company</button>
+                        <button class="tab-btn" onclick="switchTab('previous')">Previous Company</button>
+                    </div>
+
+                    <!-- Current Company Review -->
+                    <div id="currentReview" class="review-tab active">
+                        <form onsubmit="submitReview(event, false)" class="review-form">
+                            <div class="info-box">
+                                <p><strong>Company:</strong> {{ user.get('company', 'Not set') }}</p>
+                                <p><strong>Role:</strong> {{ user.get('job_role', 'Not set') }}</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rating">Rating *</label>
+                                <div class="flip-card-rating">
+                                    <div class="flip-card-single">
+                                        <div class="flip-card-inner-single">
+                                            <div class="flip-card-front-single">
+                                                <p class="rating-label">Click to Rate</p>
+                                                <div class="stars-container" id="starsContainer">
+                                                    <span class="star" data-value="1">☆</span>
+                                                    <span class="star" data-value="2">☆</span>
+                                                    <span class="star" data-value="3">☆</span>
+                                                    <span class="star" data-value="4">☆</span>
+                                                    <span class="star" data-value="5">☆</span>
+                                                </div>
+                                            </div>
+                                            <div class="flip-card-back-single">
+                                                <div class="checkmark">✓</div>
+                                                <p id="ratingText">Rating Selected</p>
+                                                <div class="stars-display" id="starsDisplay"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="rating" name="rating" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="title">Review Title *</label>
+                                <input type="text" id="title" name="title" placeholder="e.g., Great environment, poor management" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedback">Detailed Feedback *</label>
+                                <textarea id="feedback" name="feedback" rows="5" placeholder="Share your experience..." required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pros">Pros</label>
+                                    <textarea id="pros" name="pros" rows="3" placeholder="What did you like?"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cons">Cons</label>
+                                    <textarea id="cons" name="cons" rows="3" placeholder="What could be improved?"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="howGot">How did you get this job?</label>
+                                <select id="howGot" name="how_got" required>
+                                    <option value="">Select...</option>
+                                    <option value="Referral">Referral</option>
+                                    <option value="Campus Placement">Campus Placement</option>
+                                    <option value="Direct Application">Direct Application</option>
+                                    <option value="Recruiter Contact">Recruiter Contact</option>
+                                    <option value="Internal Transfer">Internal Transfer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Interview related fields -->
+                            <div class="form-group">
+                                <label for="interviewDifficulty">Interview Difficulty</label>
+                                <select id="interviewDifficulty" name="interview_difficulty">
+                                    <option value="">Select...</option>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="interviewRounds">Interview Rounds</label>
+                                <input type="number" id="interviewRounds" name="interview_rounds" min="1" placeholder="e.g., 3">
+                            </div>
+                            <div class="form-group">
+                                <label for="technicalQuestions">Technical Questions Asked</label>
+                                <textarea id="technicalQuestions" name="technical_questions" rows="3" placeholder="Briefly describe the technical questions"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="hrExperience">HR Round Experience</label>
+                                <textarea id="hrExperience" name="hr_experience" rows="3" placeholder="How was the HR round?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="tips">Tips for Future Candidates</label>
+                                <textarea id="tips" name="tips" rows="3" placeholder="Any advice for applicants"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="salaryRange">Salary Range</label>
+                                <input type="text" id="salaryRange" name="salary_range" placeholder="e.g., 80k-100k">
+                            </div>
+                            <div class="form-group">
+                                <label for="yearsExperience">Years of Experience</label>
+                                <input type="text" id="yearsExperience" name="years_experience" placeholder="e.g., 2-4">
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" name="location" placeholder="City or region">
+                            </div>
+
+                            <input type="hidden" name="is_previous" value="false">
+                            <button type="submit" class="submit-btn">Submit Review</button>
+                        </form>
+                    </div>
+
+                    <!-- Previous Company Review -->
+                    <div id="previousReview" class="review-tab">
+                        <form onsubmit="submitPreviousCompany(event)" class="review-form">
+                            <div class="info-box warning">
+                                <p>⚠️ Please provide documentation (pay slip, certificate, offer letter) to prove your employment</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prevCompany">Previous Company Name *</label>
+                                <input list="companySuggestions" type="text" id="prevCompany" name="company_name" placeholder="Enter company name" required>
+                                <datalist id="companySuggestions"></datalist>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prevRole">Job Role *</label>
+                                <select id="prevRole" name="job_role" required>
+                                    <option value="">Select your job role</option>
+                                    <option value="Software Developer (SDE)">Software Developer (SDE)</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Intern">Intern</option>
+                                    <option value="Product Manager">Product Manager</option>
+                                    <option value="Data Scientist">Data Scientist</option>
+                                    <option value="Designer">Designer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="document">Upload Proof Document *</label>
+                                <input type="file" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                                <small>Accepted: PDF, DOC, DOCX, JPG, PNG</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prevRating">Rating *</label>
+                                <div class="flip-card-rating">
+                                    <div class="flip-card-single">
+                                        <div class="flip-card-inner-single">
+                                            <div class="flip-card-front-single">
+                                                <p class="rating-label">Click to Rate</p>
+                                                <div class="stars-container" id="prevStarsContainer">
+                                                    <span class="star" data-value="1">☆</span>
+                                                    <span class="star" data-value="2">☆</span>
+                                                    <span class="star" data-value="3">☆</span>
+                                                    <span class="star" data-value="4">☆</span>
+                                                    <span class="star" data-value="5">☆</span>
+                                                </div>
+                                            </div>
+                                            <div class="flip-card-back-single">
+                                                <div class="checkmark">✓</div>
+                                                <p id="prevRatingText">Rating Selected</p>
+                                                <div class="stars-display" id="prevStarsDisplay"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="prevRating" name="rating" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prevTitle">Review Title *</label>
+                                <input type="text" id="prevTitle" name="title" placeholder="e.g., Great environment, poor management" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prevFeedback">Detailed Feedback *</label>
+                                <textarea id="prevFeedback" name="feedback" rows="5" placeholder="Share your experience..." required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prevPros">Pros</label>
+                                    <textarea id="prevPros" name="pros" rows="3" placeholder="What did you like?"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prevCons">Cons</label>
+                                    <textarea id="prevCons" name="cons" rows="3" placeholder="What could be improved?"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Add how got and interview details for previous review too -->
+                            <div class="form-group">
+                                <label for="prevHowGot">How did you get this job?</label>
+                                <select id="prevHowGot" name="how_got" required>
+                                    <option value="">Select...</option>
+                                    <option value="Referral">Referral</option>
+                                    <option value="Campus Placement">Campus Placement</option>
+                                    <option value="Direct Application">Direct Application</option>
+                                    <option value="Recruiter Contact">Recruiter Contact</option>
+                                    <option value="Internal Transfer">Internal Transfer</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <!-- Interview details -->
+                            <div class="form-group">
+                                <label for="prevInterviewDifficulty">Interview Difficulty</label>
+                                <select id="prevInterviewDifficulty" name="interview_difficulty">
+                                    <option value="">Select...</option>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prevInterviewRounds">Interview Rounds</label>
+                                <input type="number" id="prevInterviewRounds" name="interview_rounds" min="1" placeholder="e.g., 3">
+                            </div>
+                            <div class="form-group">
+                                <label for="prevTechnicalQuestions">Technical Questions Asked</label>
+                                <textarea id="prevTechnicalQuestions" name="technical_questions" rows="3" placeholder="Briefly describe the technical questions"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="prevHrExperience">HR Round Experience</label>
+                                <textarea id="prevHrExperience" name="hr_experience" rows="3" placeholder="How was the HR round?"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="prevTips">Tips for Future Candidates</label>
+                                <textarea id="prevTips" name="tips" rows="3" placeholder="Any advice for applicants"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="prevSalaryRange">Salary Range</label>
+                                <input type="text" id="prevSalaryRange" name="salary_range" placeholder="e.g., 80k-100k">
+                            </div>
+                            <div class="form-group">
+                                <label for="prevYearsExperience">Years of Experience</label>
+                                <input type="text" id="prevYearsExperience" name="years_experience" placeholder="e.g., 2-4">
+                            </div>
+                            <div class="form-group">
+                                <label for="prevLocation">Location</label>
+                                <input type="text" id="prevLocation" name="location" placeholder="City or region">
+                            </div>
+
+                            <button type="submit" class="submit-btn">Submit Review for Previous Company</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- My Reviews Section -->
+                <div id="reviews" class="my-reviews-section">
+                    <h2>My Reviews</h2>
+                    <div id="reviewsList" class="reviews-list">
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <div class="review-card editable" id="review-{{ review._id }}" 
+                                 data-title="{{ review.title }}" 
+                                 data-feedback="{{ review.feedback|e }}" 
+                                 data-rating="{{ review.rating }}" 
+                                 data-pros="{{ review.pros|e }}" 
+                                 data-cons="{{ review.cons|e }}" 
+                                 data-company="{{ review.company_id }}" 
+                                 data-jobrole="{{ review.job_role }}" data-how_got="{{ review.how_got|e }}" 
+                                 data-interview_difficulty="{{ review.interview_difficulty|e }}" 
+                                 data-interview_rounds="{{ review.interview_rounds|e }}" 
+                                 data-technical_questions="{{ review.technical_questions|e }}" 
+                                 data-hr_experience="{{ review.hr_experience|e }}" 
+                                 data-tips="{{ review.tips|e }}" 
+                                 data-salary_range="{{ review.salary_range|e }}" 
+                                 data-years_experience="{{ review.years_experience|e }}" 
+                                 data-location="{{ review.location|e }}">
+                                <div class="review-header">
+                                    <div class="review-meta">
+                                        <h3>{{ review.title }}</h3>
+                                        <p class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</p>
+                                    </div>
+                                    <div class="review-actions">
+                                        <button class="edit-btn" onclick="openEditModal('{{ review._id }}')">Edit</button>
+                                        <button class="delete-btn" onclick="deleteReview('{{ review._id }}')">Delete</button>
+                                    </div>
+                                </div>
+                                <div class="review-content">
+                                    <p><strong>Company:</strong> {{ review.company_id }}</p>
+                                    <p><strong>Role:</strong> {{ review.job_role }}</p>
+                                    <p><strong>Rating:</strong> {{ '⭐' * review.rating }}</p>
+                                    <p class="feedback">{{ review.feedback }}</p>
+                                    {% if review.pros %}
+                                    <p><strong>Pros:</strong> {{ review.pros }}</p>
+                                    {% endif %}
+                                    {% if review.cons %}
+                                    <p><strong>Cons:</strong> {{ review.cons }}</p>
+                                    {% endif %}
+                                    {% if review.how_got %}
+                                    <p><strong>How I got it:</strong> {{ review.how_got }}</p>
+                                    {% endif %}
+                                    {% if review.interview_difficulty %}
+                                    <p><strong>Interview Difficulty:</strong> {{ review.interview_difficulty }}</p>
+                                    {% endif %}
+                                    {% if review.interview_rounds %}
+                                    <p><strong>Interview Rounds:</strong> {{ review.interview_rounds }}</p>
+                                    {% endif %}
+                                    {% if review.technical_questions %}
+                                    <p><strong>Technical Questions:</strong> {{ review.technical_questions }}</p>
+                                    {% endif %}
+                                    {% if review.hr_experience %}
+                                    <p><strong>HR Experience:</strong> {{ review.hr_experience }}</p>
+                                    {% endif %}
+                                    {% if review.tips %}
+                                    <p><strong>Tips:</strong> {{ review.tips }}</p>
+                                    {% endif %}
+                                    {% if review.salary_range %}
+                                    <p><strong>Salary Range:</strong> {{ review.salary_range }}</p>
+                                    {% endif %}
+                                    {% if review.years_experience %}
+                                    <p><strong>Years Exp:</strong> {{ review.years_experience }}</p>
+                                    {% endif %}
+                                    {% if review.location %}
+                                    <p><strong>Location:</strong> {{ review.location }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <p>You haven't written any reviews yet. Start by sharing your experience!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Review Modal -->
+    <div id="editModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Review</h2>
+            <form id="editReviewForm" class="review-form" onsubmit="submitEditReview(event)">
+                <input type="hidden" id="editReviewId">
+                <div class="form-group">
+                    <label>Rating *</label>
+                    <div class="flip-card-rating">
+                        <div class="flip-card-single">
+                            <div class="flip-card-inner-single">
+                                <div class="flip-card-front-single">
+                                    <p class="rating-label">Click to Rate</p>
+                                    <div class="stars-container" id="editStarsContainer">
+                                        <span class="star" data-value="1">☆</span>
+                                        <span class="star" data-value="2">☆</span>
+                                        <span class="star" data-value="3">☆</span>
+                                        <span class="star" data-value="4">☆</span>
+                                        <span class="star" data-value="5">☆</span>
+                                    </div>
+                                </div>
+                                <div class="flip-card-back-single">
+                                    <div class="checkmark">✓</div>
+                                    <p id="editRatingText">Rating Selected</p>
+                                    <div class="stars-display" id="editStarsDisplay"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editRating" name="rating" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTitle">Title *</label>
+                    <input type="text" id="editTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editFeedback">Feedback *</label>
+                    <textarea id="editFeedback" name="feedback" rows="5" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPros">Pros</label>
+                        <textarea id="editPros" name="pros" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCons">Cons</label>
+                        <textarea id="editCons" name="cons" rows="3"></textarea>
+                    </div>
+                </div>
+                <!-- Interview fields for editing -->
+                <div class="form-group">
+                    <label for="editInterviewDifficulty">Interview Difficulty</label>
+                    <select id="editInterviewDifficulty" name="interview_difficulty">
+                        <option value="">Select...</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editInterviewRounds">Interview Rounds</label>
+                    <input type="number" id="editInterviewRounds" name="interview_rounds" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="editTechnicalQuestions">Technical Questions Asked</label>
+                    <textarea id="editTechnicalQuestions" name="technical_questions" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editHrExperience">HR Round Experience</label>
+                    <textarea id="editHrExperience" name="hr_experience" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editTips">Tips for Future Candidates</label>
+                    <textarea id="editTips" name="tips" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editSalaryRange">Salary Range</label>
+                    <input type="text" id="editSalaryRange" name="salary_range">
+                </div>
+                <div class="form-group">
+                    <label for="editYearsExperience">Years of Experience</label>
+                    <input type="text" id="editYearsExperience" name="years_experience">
+                </div>
+                <div class="form-group">
+                    <label for="editLocation">Location</label>
+                    <input type="text" id="editLocation" name="location">
+                </div>
+                <button type="submit" class="submit-btn">Update Review</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <div id="successMessage" class="success-message" style="display: none;"></div>
+
+    <script>
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.review-tab');
+            const buttons = document.querySelectorAll('.tab-btn');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
+
+            if (tab === 'current') {
+                document.getElementById('currentReview').classList.add('active');
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('previousReview').classList.add('active');
+                event.target.classList.add('active');
+            }
+        }
+
+        function submitReview(event, isPrevious) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            // Get company ID - for now, we'll need to fetch or use the company name
+            fetch('{{ url_for("manage_companies") }}')
+            .then(response => response.json())
+            .then(async companies => {
+                const currentCompany = '{{ user.get("company", "") }}'.trim();
+                let company = companies.find(c => c.name.toLowerCase() === currentCompany.toLowerCase());
+
+                // If company does not exist in companies collection, create it via API
+                if (!company) {
+                    try {
+                        const resp = await fetch('{{ url_for("add_company") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ company_name: currentCompany })
+                        });
+                        const created = await resp.json();
+                        if (created && created.company_id) {
+                            company = { _id: created.company_id, name: currentCompany };
+                        } else {
+                            showError(created.error || 'Failed to create company.');
+                            return;
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showError('Failed to create or find current company. Please contact support.');
+                        return;
+                    }
+                }
+
+                data.company_id = company._id;
+                data.job_role = '{{ user.get("job_role", "") }}';
+
+                // Ensure rating is integer between 1 and 5
+                const ratingVal = parseInt(data.rating, 10);
+                if (!ratingVal || ratingVal < 1 || ratingVal > 5) {
+                    showError('Please select a rating between 1 and 5 stars.');
+                    return;
+                }
+                data.rating = ratingVal;
+
+                try {
+                    const resp = await fetch('{{ url_for("create_review") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await resp.json();
+                    if (result.success) {
+                        showSuccess('Review submitted successfully!');
+                        form.reset();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError(result.error || 'Failed to submit review');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showError('An error occurred. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showError('Unable to fetch companies. Please try again.');
+            });
+        }
+
+        function submitPreviousCompany(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Validate rating
+            const rating = formData.get('rating');
+            if (!rating || rating < 1 || rating > 5) {
+                showError('Please select a rating between 1 and 5 stars.');
+                return;
+            }
+            
+            // First, add the previous company with document
+            fetch('{{ url_for("add_previous_company") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(async response => {
+                const contentType = response.headers.get('content-type') || '';
+                if (contentType.includes('application/json')) {
+                    return response.json();
+                }
+                throw new Error('Invalid server response');
+            })
+            .then(async data => {
+                if (data.success) {
+                    // Now submit the review for this previous company
+                    const companyName = formData.get('company_name');
+                    const jobRole = formData.get('job_role');
+                    
+                    // Get or create company
+                    const companiesResp = await fetch('{{ url_for("manage_companies") }}');
+                    const companies = await companiesResp.json();
+                    let company = companies.find(c => c.name.toLowerCase() === companyName.toLowerCase());
+                    
+                    if (!company) {
+                        const createResp = await fetch('{{ url_for("add_company") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ company_name: companyName })
+                        });
+                        const created = await createResp.json();
+                        if (created && created.company_id) {
+                            company = { _id: created.company_id, name: companyName };
+                        } else {
+                            showError('Failed to create company for review.');
+                            return;
+                        }
+                    }
+                    
+                    // Submit review
+                    const reviewData = {
+                        company_id: company._id,
+                        job_role: jobRole,
+                        rating: parseInt(formData.get('rating'), 10),
+                        title: formData.get('title'),
+                        feedback: formData.get('feedback'),
+                        pros: formData.get('pros') || '',
+                        cons: formData.get('cons') || '',
+                        how_got: formData.get('how_got'),
+                        interview_difficulty: formData.get('interview_difficulty') || '',
+                        interview_rounds: formData.get('interview_rounds') || '',
+                        technical_questions: formData.get('technical_questions') || '',
+                        hr_experience: formData.get('hr_experience') || '',
+                        tips: formData.get('tips') || '',
+                        salary_range: formData.get('salary_range') || '',
+                        years_experience: formData.get('years_experience') || '',
+                        location: formData.get('location') || '',
+                        is_previous: 'true'
+                    };
+                    
+                    const reviewResp = await fetch('{{ url_for("create_review") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reviewData)
+                    });
+                    const reviewResult = await reviewResp.json();
+                    
+                    if (reviewResult.success) {
+                        showSuccess('Previous company and review submitted successfully!');
+                        form.reset();
+                        // Reset flip card
+                        const flipCard = document.querySelector('#prevStarsContainer').closest('.flip-card-single');
+                        if (flipCard) flipCard.classList.remove('flipped');
+                        const stars = document.querySelectorAll('#prevStarsContainer .star');
+                        stars.forEach(s => {
+                            s.textContent = '☆';
+                            s.classList.remove('selected');
+                        });
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showError(reviewResult.error || 'Failed to submit review');
+                    }
+                } else {
+                    showError(data.error || 'Failed to add previous company');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred. Please try again.');
+            });
+        }
+
+        // ---------- Review edit modal helpers ----------
+        function openEditModal(reviewId) {
+            const card = document.getElementById(`review-${reviewId}`);
+            if (!card) return;
+            document.getElementById('editReviewId').value = reviewId;
+            document.getElementById('editTitle').value = card.dataset.title;
+            document.getElementById('editFeedback').value = card.dataset.feedback;
+            document.getElementById('editPros').value = card.dataset.pros || '';
+            document.getElementById('editCons').value = card.dataset.cons || '';
+            
+            // interview metadata
+            document.getElementById('editInterviewDifficulty').value = card.dataset.interview_difficulty || '';
+            document.getElementById('editInterviewRounds').value = card.dataset.interview_rounds || '';
+            document.getElementById('editTechnicalQuestions').value = card.dataset.technical_questions || '';
+            document.getElementById('editHrExperience').value = card.dataset.hr_experience || '';
+            document.getElementById('editTips').value = card.dataset.tips || '';
+            document.getElementById('editSalaryRange').value = card.dataset.salary_range || '';
+            document.getElementById('editYearsExperience').value = card.dataset.years_experience || '';
+            document.getElementById('editLocation').value = card.dataset.location || '';
+            
+            // Set rating for flip card
+            const rating = parseInt(card.dataset.rating);
+            document.getElementById('editRating').value = rating;
+            
+            // Reset flip card
+            const flipCard = document.querySelector('#editStarsContainer').closest('.flip-card-single');
+            if (flipCard) {
+                flipCard.classList.remove('flipped');
+            }
+            
+            // Update stars display
+            const stars = document.querySelectorAll('#editStarsContainer .star');
+            stars.forEach((s, i) => {
+                if (i < rating) {
+                    s.textContent = '★';
+                    s.classList.add('selected');
+                } else {
+                    s.textContent = '☆';
+                    s.classList.remove('selected');
+                }
+            });
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function submitEditReview(e) {
+            e.preventDefault();
+            const reviewId = document.getElementById('editReviewId').value;
+            const form = document.getElementById('editReviewForm');
+            const data = Object.fromEntries(new FormData(form));
+            data.rating = parseInt(data.rating, 10);
+            fetch(`{{ url_for("update_review", review_id="") }}${reviewId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(resp => resp.json())
+            .then(res => {
+                if (res.success) {
+                    showSuccess('Review updated!');
+                    closeEditModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showError(res.error || 'Failed to update review');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showError('Error updating review');
+            });
+        }
+
+        // ---------- Company autosuggest ----------
+        document.getElementById('prevCompany').addEventListener('input', debounce(function(e) {
+            const term = e.target.value.trim();
+            if (!term) return;
+            fetch(`{{ url_for("manage_companies") }}?search=${encodeURIComponent(term)}`)
+                .then(r => r.json())
+                .then(list => {
+                    const dataList = document.getElementById('companySuggestions');
+                    dataList.innerHTML = '';
+                    list.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.name;
+                        dataList.appendChild(opt);
+                    });
+                });
+        }, 300));
+
+        // ---------- utility: debounce from earlier global js if not available ----------
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function deleteReview(reviewId) {
+            if (confirm('Are you sure you want to delete this review?')) {
+                fetch(`{{ url_for("delete_review", review_id="") }}${reviewId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showSuccess('Review deleted successfully!');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showError(data.error);
+                    }
+                })
+                .catch(error => {
+                    showError('An error occurred. Please try again.');
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        // Flip card rating system with clickable stars
+        function initFlipCardRating(containerId, displayId, textId, hiddenInputId) {
+            const container = document.getElementById(containerId);
+            const display = document.getElementById(displayId);
+            const ratingText = document.getElementById(textId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const flipCard = container?.closest('.flip-card-single');
+            
+            if (!container) return;
+            
+            const stars = container.querySelectorAll('.star');
+            
+            // Hover effect
+            stars.forEach((star, index) => {
+                star.addEventListener('mouseenter', () => {
+                    stars.forEach((s, i) => {
+                        if (i <= index) {
+                            s.textContent = '★';
+                            s.classList.add('hovered');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('hovered');
+                        }
+                    });
+                });
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                const currentRating = parseInt(hiddenInput?.value || 0);
+                stars.forEach((s, i) => {
+                    s.classList.remove('hovered');
+                    if (i < currentRating) {
+                        s.textContent = '★';
+                    } else {
+                        s.textContent = '☆';
+                    }
+                });
+            });
+            
+            // Click to select rating
+            stars.forEach((star) => {
+                star.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const rating = parseInt(star.getAttribute('data-value'));
+                    
+                    // Update hidden input
+                    if (hiddenInput) {
+                        hiddenInput.value = rating;
+                    }
+                    
+                    // Update stars on front
+                    stars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.textContent = '★';
+                            s.classList.add('selected');
+                        } else {
+                            s.textContent = '☆';
+                            s.classList.remove('selected');
+                        }
+                    });
+                    
+                    // Update back side
+                    if (display) {
+                        display.textContent = '★'.repeat(rating);
+                    }
+                    if (ratingText) {
+                        const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+                        ratingText.textContent = `${rating} Star${rating > 1 ? 's' : ''} - ${labels[rating]}`;
+                    }
+                    
+                    // Flip the card
+                    if (flipCard) {
+                        flipCard.classList.add('flipped');
+                        
+                        // Allow clicking back side to change rating
+                        setTimeout(() => {
+                            const backSide = flipCard.querySelector('.flip-card-back-single');
+                            if (backSide) {
+                                backSide.style.cursor = 'pointer';
+                                backSide.onclick = () => {
+                                    flipCard.classList.remove('flipped');
+                                };
+                            }
+                        }, 600);
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initFlipCardRating('starsContainer', 'starsDisplay', 'ratingText', 'rating');
+            initFlipCardRating('editStarsContainer', 'editStarsDisplay', 'editRatingText', 'editRating');
+            initFlipCardRating('prevStarsContainer', 'prevStarsDisplay', 'prevRatingText', 'prevRating');
+        });
+    </script>
+</body>
+</html>
